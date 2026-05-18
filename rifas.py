@@ -2,7 +2,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import mm
 from reportlab.pdfgen import canvas
 
-path = "rectangles_1_to_250.pdf"
+path = "rifas.pdf"
 
 c = canvas.Canvas(path, pagesize=A4)
 w, h = A4
