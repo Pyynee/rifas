@@ -1,57 +1,107 @@
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import mm
 from reportlab.pdfgen import canvas
+from reportlab.lib import colors
 
-path = "rifas.pdf"
 
-c = canvas.Canvas(path, pagesize=A4)
-w, h = A4
+def create_numbered_pdf(output_path, ranges, booked_numbers=None):
+    """
+    Create a PDF with numbered rectangles.
 
-margin_x = 15 * mm
-margin_y = 15 * mm
+    Parameters:
+    - output_path: path of the PDF file
+    - ranges: list of tuples with start/end numbers
+    Example: [(1, 50), (51, 100)]
+    - booked_numbers: list or set of numbers to mark with a cross
+    """
+
+    if booked_numbers is None:
+        booked_numbers = []
+
+    booked_numbers = set(booked_numbers)
+
+    c = canvas.Canvas(output_path, pagesize=A4)
+    width, height = A4
+
+    margin_x = 15 * mm
+    margin_y = 15 * mm
+
+    for page_index, (start_num, end_num) in enumerate(ranges):
+
+        cols = 5
+        rows = 10
+
+        usable_width = width - 2 * margin_x
+        usable_height = height - 2 * margin_y
+
+        rect_width = usable_width / cols
+        rect_height = usable_height / rows
+
+        current = start_num
+
+        for r in range(rows):
+            for col in range(cols):
+
+                if current > end_num:
+                    break
+
+                x = margin_x + col * rect_width
+                y = height - margin_y - (r + 1) * rect_height
+
+                # Draw rectangle
+                c.rect(x, y, rect_width, rect_height)
+
+                # Draw number in top-right corner
+                c.setFont("Helvetica-Bold", 9)
+                c.drawRightString(
+                    x + rect_width - 5,
+                    y + rect_height - 11,
+                    str(current)
+                )
+
+                # If booked -> draw X cross
+                if current in booked_numbers:
+                    c.setStrokeColor(colors.red)
+                    c.setLineWidth(2)
+
+                    c.line(x + 5, y + 5,
+                           x + rect_width - 5, y + rect_height - 5)
+
+                    c.line(x + 5, y + rect_height - 5,
+                           x + rect_width - 5, y + 5)
+
+                    # Reset style
+                    c.setStrokeColor(colors.black)
+                    c.setLineWidth(1)
+
+                current += 1
+
+        if page_index < len(ranges) - 1:
+            c.showPage()
+
+    c.save()
+
+
+# -----------------------------
+# RUN THE SCRIPT
+# -----------------------------
 
 ranges = [
     (1, 50),
     (51, 100),
     (101, 150),
     (151, 200),
-    (201, 250),
+    (201, 250)
 ]
 
-for idx, (start_num, end_num) in enumerate(ranges):
-    cols = 5
-    rows = 10
+booked_numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                  25, 50, 75, 100, 125, 150, 175, 200, 225, 250]
 
-    usable_w = w - 2 * margin_x
-    usable_h = h - 2 * margin_y
+create_numbered_pdf(
+    output_path="rifas.pdf",
+    ranges=ranges,
+    booked_numbers=booked_numbers
+)
 
-    rect_w = usable_w / cols
-    rect_h = usable_h / rows
 
-    current = start_num
-
-    for r in range(rows):
-        for col in range(cols):
-            if current > end_num:
-                break
-
-            x = margin_x + col * rect_w
-            y = h - margin_y - (r + 1) * rect_h
-
-            c.rect(x, y, rect_w, rect_h)
-
-            c.setFont("Helvetica-Bold", 9)
-            c.drawRightString(
-                x + rect_w - 5,
-                y + rect_h - 11,
-                str(current)
-            )
-
-            current += 1
-
-    if idx < len(ranges) - 1:
-        c.showPage()
-
-c.save()
-
-print(f"PDF created: {path}")
+print("PDF generated successfully!")
