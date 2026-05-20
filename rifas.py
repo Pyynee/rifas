@@ -59,20 +59,19 @@ def create_numbered_pdf(output_path, ranges, booked_numbers=None):
                     str(current)
                 )
 
-                # If booked -> draw X cross
+                # If booked -> write "vendido"
                 if current in booked_numbers:
-                    c.setStrokeColor(colors.red)
-                    c.setLineWidth(2)
+                    c.setFont("Helvetica-Bold", 10)
+                    c.setFillColor(colors.red)
 
-                    c.line(x + 5, y + 5,
-                           x + rect_width - 5, y + rect_height - 5)
-
-                    c.line(x + 5, y + rect_height - 5,
-                           x + rect_width - 5, y + 5)
+                    c.drawCentredString(
+                        x + rect_width / 2,
+                        y + rect_height / 2 - 4,
+                        "vendido"
+                    )
 
                     # Reset style
-                    c.setStrokeColor(colors.black)
-                    c.setLineWidth(1)
+                    c.setFillColor(colors.black)
 
                 current += 1
 
