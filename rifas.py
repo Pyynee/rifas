@@ -16,9 +16,11 @@ def create_numbered_pdf(output_path, ranges, booked_numbers=None):
     """
 
     if booked_numbers is None:
-        booked_numbers = []
+        booked_numbers_set = set()
+    else:
+        booked_numbers_set = set(booked_numbers)
 
-    booked_numbers = set(booked_numbers)
+    booked_numbers = booked_numbers_set
 
     c = canvas.Canvas(output_path, pagesize=A4)
     width, height = A4
@@ -86,7 +88,7 @@ def create_numbered_pdf(output_path, ranges, booked_numbers=None):
 # RUN THE SCRIPT
 # -----------------------------
 
-ranges = [
+number_ranges = [
     (1, 50),
     (51, 100),
     (101, 150),
@@ -94,12 +96,11 @@ ranges = [
     (201, 250)
 ]
 
-booked_numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-                  25, 50, 75, 100, 125, 150, 175, 200, 225, 250]
+booked_numbers = []
 
 create_numbered_pdf(
     output_path="rifas.pdf",
-    ranges=ranges,
+    ranges=number_ranges,
     booked_numbers=booked_numbers
 )
 
